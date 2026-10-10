@@ -13,3 +13,6 @@ __pycache__/
 *.str
 *.wdb
 *.dcp
+hardware/**/build/
+.DS_Store
+Thumbs.db
