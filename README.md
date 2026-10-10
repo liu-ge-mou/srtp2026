@@ -7,7 +7,7 @@
 安装 Git、Vivado 2018.2（或能打开相同 Verilog 工程的版本）及软件实验所需 Python。然后执行：
 
 ```powershell
-git clone <此仓库的 HTTPS 地址>
+git clone https://github.com/liu-ge-mou/srtp2026.git
 cd srtp2026
 git status
 ```
