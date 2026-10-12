@@ -2,6 +2,12 @@
 
 更新日期：2026-10-12。
 
+## 最近一次协同接入
+
+- 日期：2026-10-12。本机项目目录已检出并跟踪 GitHub `main`；旧 Vivado 工程和原有文档保存在仓库外，供后续对照。
+- 验证：`git pull --ff-only origin main` 显示 `Already up to date.`，`git status -sb` 显示 `## main...origin/main`。本轮未运行 Python 或 Vivado，也未进行新的课程验收。
+- 下一步：继续按下方学习回合记录，先核对 QKV 拼接、切分、MAC 和计时解释；硬件任务以 `hardware/` 为共同源码。
+
 ## 最近一次学习回合
 
 - 主题：QKV 融合与性能测量两步重讲后，按用户要求更新进度并推送；本轮未开始新的课程内容。
