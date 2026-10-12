@@ -1,6 +1,6 @@
 # NumPy Transformer 基础实现
 
-本目录对应任务清单的“注意力计算”和“Transformer block”。当前已实现单头注意力、Post-LN 前向计算、QKV 融合一致性检查和简单计时，以及因果掩码自检；KV Cache 尚未实现。
+本目录对应任务清单的“注意力计算”和“Transformer block”。当前已实现单头注意力、Post-LN 前向计算、QKV 融合一致性检查和简单计时，以及因果掩码与逐 Token 重算基线；KV Cache 尚未实现。
 
 ## 运行
 
@@ -12,8 +12,9 @@
     python software/qkv_fusion.py
     python software/qkv_benchmark.py
     python software/causal_attention.py
+    python software/kv_recompute.py
 
-基础、融合、计时和因果注意力四个脚本已在 Python 3.14.6、NumPy 2.4.6 下运行；计时与因果注意力脚本还在 Python 3.13.3、NumPy 2.4.6 下复核。脚本固定随机种子 0，检查失败时抛出 AssertionError。基础脚本打印张量形状、注意力矩阵、行和与最终输出；融合脚本打印数值误差；计时脚本打印 NumPy 的 BLAS 构建后端和两种实现的中位时间。正常结束时各自打印 PASS。
+基础、融合、计时、因果注意力和逐步重算五个脚本已在 Python 3.14.6、NumPy 2.4.6 下运行；计时、因果注意力和逐步重算脚本还在 Python 3.13.3、NumPy 2.4.6 下复核。脚本固定随机种子 0，检查失败时抛出 AssertionError。基础脚本打印张量形状、注意力矩阵、行和与最终输出；融合脚本打印数值误差；计时脚本打印 NumPy 的 BLAS 构建后端和两种实现的中位时间。正常结束时各自打印 PASS。
 
 ## 文件中的计算顺序
 
@@ -67,7 +68,7 @@ qkv_benchmark.py 对应原始要求“题目二 → 4. 基础优化：QKV 融合
 
 ## 因果自注意力
 
-causal_attention.py 对应原始要求“题目二 → 5. 软件部署小实验 → 方向 A：简单 KV Cache”的单层因果自注意力前提。本课实现整段输入的因果注意力；逐 Token 重算与缓存留待下一项。
+causal_attention.py 对应原始要求“题目二 → 5. 软件部署小实验 → 方向 A：简单 KV Cache”的单层因果自注意力前提。该脚本实现整段输入的因果注意力；逐 Token 重算基线见下节，缓存留待后续任务。
 
 设计与数据流：复用 transformer_numpy.py 的稳定 softmax 和固定种子示例；输入 X(N,d)、四个 (d,d) 权重，先算 Q/K/V(N,d)，再算 scores=Q@K.T/√d(N,N)。行 i 是当前 Token，列 j 是可读取的 Token。np.triu(..., k=1) 标出 j>i 的未来位置；np.where 把这些分数改为 -inf；最后逐行 softmax 得到 weights(N,N)，输出 (weights@V)@Wo(N,d)。掩码必须在 softmax 前应用；事后清零概率会破坏行和为 1。
 
@@ -76,3 +77,15 @@ causal_attention.py 对应原始要求“题目二 → 5. 软件部署小实验 
 检查：形状、未来权重严格为 0、权重非负、每行和约为 1、概率和输出有限；比较完整序列与各前缀输出，改动最后一个 Token 后确认前面位置输出不变。masked_scores 的禁用项故意是 -inf，不能对整个 masked_scores 作有限值断言；每行都包含当前位置，不会出现全 -inf 行。此脚本未实现 KV Cache，也不代表学习者独立掌握。
 
 在仓库根目录运行 python software/causal_attention.py。2026-10-12 在 Python 3.14.6 与 3.13.3、NumPy 2.4.6 下均打印 PASS；3×4 示例权重约为 [[1,0,0],[0.6092,0.3908,0],[0.0533,0.0081,0.9386]]。
+
+## 逐 Token 重算 K/V 基线
+
+kv_recompute.py 对应原始要求“题目二 → 5 → 方向 A：简单 KV Cache”的第 1 项。本脚本只实现每步重算 K/V 的基线；缓存版以及两版耗时比较尚未实现。输入沿用 X(N,d) 和相同的四个 (d,d) 权重，每一步只输出新 Token 的一行 (1,d)，最后用 np.vstack 拼成 (N,d)。
+
+设计顺序：第 end 步取 current=X[end-1:end]，形状 (1,d)，只投影当前的 Q；取 history=X[:end]，形状 (end,d)，每一步重新投影所有历史及当前的 K、V，形状均为 (end,d)。然后算 scores=q@K.T/√d，形状 (1,end)，沿最后一维 softmax 得到 (1,end) 权重，输出 (weights@V)@Wo，形状 (1,d)。history 已经截断到当前位置，没有未来 Token，因此这一步不需要额外掩码。注意切片 end-1:end 保留二维形状；若取 X[end-1] 会得到一维向量，后续形状和整段基线不同。
+
+三 Token、二维单位权重例子：第 1 步只看 [1,0]，输出 [1,0]；第 2 步的当前 Q=[0,1]，历史 K 为 [[1,0],[0,1]]，分数 [0,1/√2]，softmax 权重约 [0.3302,0.6698]，输出也约 [0.3302,0.6698]。第 3 步重新计算三行 K 和 V。二维例子的每步 K/V 元素数为 [4,8,12]，累计 24；每个 Token 只算一次需 12，故重复计算了 12 个。
+
+一般地，第 t 步（t 从 1 开始）的 K/V 投影输出有 2td 个元素；T 步累计 2d(1+...+T)=dT(T+1) 个，只算一次则是 2dT 个，重复元素数为 dT(T-1)。这只是 K/V 投影输出元素计数，不是矩阵乘法 MAC 数或运行时间。固定示例 T=3、d=4，三步为 [8,16,24]，累计 48、只算一次 24、重复 24。
+
+检查顺序：先用同一 X 与权重算完整因果注意力；逐行比较逐步输出；再核对每步、累计与重复元素数，最后用二维手算例子检查前两步。运行 python software/kv_recompute.py：2026-10-12 在 Python 3.14.6 / NumPy 2.4.6 下最大绝对误差 0.0，在 Python 3.13.3 / NumPy 2.4.6 下为 1.7763568394002505e-15，两次均 PASS。
