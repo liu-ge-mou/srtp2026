@@ -10,11 +10,11 @@
 
 ## 最近一次学习回合
 
-- 主题：学习者允许一次连续讲几步，并要求子代理自检；本轮串讲 QKV 计时、因果掩码、KV Cache 原理。
-- 产物：两个只读子代理分别检查技术准确性与教学顺序；根据建议补充组内平均/跨组中位数、softmax 前遮盖、K/V 重算与历史读取的区别，更新 `学习任务规划与进度.md`。未修改源码。
-- 验证：`git pull --rebase origin main` 显示 Already up to date；本轮已检查三个 `software/` Python 文件源码，未运行 Python 或 Vivado。当前 `self_attention` 无因果掩码，仓库无 KV Cache 实现；此前 QKV 脚本结果不可当成本轮新运行。
-- 未解决：三步均只完成讲解，学习者独立练习未提交；QKV 计时、因果掩码、KV Cache 及基础 Transformer 理解继续待验收，硬件 A/B 待办不变。
-- 下一步：按三道独立练习逐项反馈，再实现并验证因果注意力与 KV Cache；不要把当前双向 `self_attention` 视为因果实现。
+- 主题：学习者指出上一回合第 2、3 步讲解未达到教学规范；更正进度并补讲因果掩码与 KV Cache。
+- 产物：先更正 `学习任务规划与进度.md` 中第 2、3 步的“已讲解”误记；随后以 `3×2` 数值例补足因果注意力逐行 softmax、逐 Token 缓存状态、拟实现函数的参数/返回值/执行顺序与易错处。两个子代理只读复核技术和教学质量。未修改源码。
+- 验证：`git pull --rebase origin main` 显示 Already up to date；本轮已检查 `software/` 中相关源码，未运行 Python 或 Vivado。当前 `self_attention` 无因果掩码，仓库无 KV Cache 实现；此前 QKV 脚本结果不可当成本轮新运行。
+- 未解决：QKV 计时、因果掩码、KV Cache 及基础 Transformer 理解继续待学习者独立验收；因果掩码和 KV Cache 代码未实现，硬件 A/B 待办不变。
+- 下一步：核对补讲后的因果掩码与 KV Cache 独立练习，再实现并验证；不要把当前双向 `self_attention` 视为因果实现。
 
 ## 当前状态
 
