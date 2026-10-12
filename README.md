@@ -12,7 +12,7 @@ cd srtp2026
 git status
 ```
 
-在此目录打开 Codex，先读取 `AGENTS.md`、原始要求、任务清单、交接记录和[协作规则](WORKFLOW.md)。硬件源码在 `hardware/direction_a/`、`hardware/direction_b/`；各目录的 `create_project.tcl` 可重建 Vivado 工程，具体命令见[硬件说明](hardware/README.md)。软件实现尚未创建。
+在此目录打开 Codex，先读取 `AGENTS.md`、原始要求、任务清单、交接记录和[协作规则](WORKFLOW.md)。硬件源码在 `hardware/direction_a/`、`hardware/direction_b/`；各目录的 `create_project.tcl` 可重建 Vivado 工程，具体命令见[硬件说明](hardware/README.md)。软件基础实现位于 software/transformer_numpy.py，运行说明见 software/README.md。
 
 ## 日常交接
 
