@@ -70,6 +70,8 @@ def main():
     fused_us = float(np.median(samples["fused"])) / 1000
 
     print("Python:", sys.version.split()[0], "NumPy:", np.__version__)
+    blas_config = np.show_config(mode="dicts").get("Build Dependencies", {}).get("blas", {})
+    print("NumPy BLAS 构建后端:", blas_config.get("name", "unknown"))
     print("随机种子: 0; X:", x.shape, "Wq/Wk/Wv:", Wq.shape, "Wqkv:", Wqkv.shape)
     print("Q/K/V 最大绝对误差:", max_error)
     print("预热: 每种实现", warmup_calls, "次; 重复:", repeats, "组 × 每组", batch_calls, "次")
