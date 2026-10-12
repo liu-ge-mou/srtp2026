@@ -4,11 +4,11 @@
 
 ## 最近一次学习回合
 
-- 主题：重讲 QKV 融合及下一步性能测量；按用户反馈补足推导、代码规划、执行路径和自查。
-- 产物：新增 software/qkv_benchmark.py；更新 software/README.md、学习任务规划与进度.md 和本交接记录；修正 WORKFLOW.md 中软件尚未实现的过时表述。
-- 验证：python software/qkv_fusion.py 通过，Q/K/V、注意力和 Block 最大误差均为 0.0；python software/qkv_benchmark.py 通过，Q/K/V 最大误差 8.881784197001252e-15，两次运行分开/融合分别为 46.550/29.099 与 44.078/33.469 微秒每次，比值 1.600 与 1.317；Python 3.14.6、NumPy 2.4.6。性能数值只代表本机这两次运行。
-- 未解决：学习者尚未独立解释 QKV 拼接、切分、MAC 和计时设计；基础 Transformer 手算与代码理解仍待验收，硬件 A/B 待办不变。
-- 下一步：先核对学习者对 QKV 与计时结果的独立理解，再讲因果掩码，随后进入逐 token 推理和 KV Cache。
+- 主题：QKV 融合与性能测量两步重讲后，按用户要求更新进度并推送；本轮未开始新的课程内容。
+- 产物：更新学习任务规划与进度.md，明确标记两项已讲解内容；同步本交接记录。计时脚本 software/qkv_benchmark.py 已在上一轮提交。
+- 验证：本轮核对原始要求、仓库状态及已有记录，未重新运行 Python 或 Vivado。上一轮 python software/qkv_fusion.py 和 python software/qkv_benchmark.py 均通过；计时两次的分开/融合结果分别为 46.550/29.099 与 44.078/33.469 微秒每次，环境为 Python 3.14.6、NumPy 2.4.6。
+- 未解决：学习者尚未提交 QKV 拼接、切分、MAC 和计时解释；基础 Transformer 手算与代码理解仍待验收，硬件 A/B 待办不变。
+- 下一步：先核对学习者对 QKV 与计时结果的独立理解，再进入因果掩码、逐 token 推理及 KV Cache。
 
 ## 当前状态
 
