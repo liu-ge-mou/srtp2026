@@ -10,22 +10,22 @@
 
 ## 最近一次学习回合
 
-- 主题：学习者独立运行 QKV 计时后发现分开版持续较快；复核计时结果和不同环境的构建信息。
-- 产物：software/qkv_benchmark.py 增加 NumPy BLAS 构建后端输出；software/README.md 记录用户截图、同解释器复跑及拆分诊断；学习任务规划与进度.md 新增学习者独立运行证据。未修改 QKV 数学实现。
-- 验证：学习者截图为 Python 3.13.3、NumPy 2.4.6，分开/融合 48.742/59.942 微秒每次，比值 0.813，Q/K/V 误差 0.0，PASS；学习者报告多次均分开版较快。助手用同一 scipy-openblas 构建复跑三次，分开/融合为 48.672/58.224、50.065/74.460、48.237/67.838，方向一致。另一 Python 3.14.6、NumPy 2.4.6 的 mkl-sdl 构建运行 53.911/38.632。两环境还存在其他差异，未证明 BLAS 是唯一原因。
-- 未解决：学习者对计时边界、批次平均和中位数尚缺完整独立解释；因果掩码与 KV Cache 代码未实现，基础 Transformer 和硬件 A/B 待办保留。
-- 下一步：先核对计时方法的独立解释，再继续因果掩码与 KV Cache 的练习、实现和验证。
+- 主题：因果掩码与单层因果自注意力；按原始要求的 KV Cache 实验先建立因果计算基线。
+- 产物：software/causal_attention.py 新增实现与自检；software/README.md 写明设计、三 Token 手算例子及运行命令；学习任务规划与进度.md 分开记录理解和代码证据。
+- 验证：python software/causal_attention.py 在 Python 3.14.6、NumPy 2.4.6 下 PASS；D:/python/python.exe software/causal_attention.py 在 Python 3.13.3、NumPy 2.4.6 下 PASS。输出 (3,4)，权重约 [[1,0,0],[0.6092,0.3908,0],[0.0533,0.0081,0.9386]]；未来权重零、行和一、前缀一致与未来扰动检查通过。
+- 未解决：学习者尚未独立手算、解释或运行本课脚本。QKV 计时方法完整解释、基础 Transformer 练习仍待验收；逐 Token 重算和 KV Cache 尚未实现。
+- 下一步：验收第 1 行允许位置和归一化，再实现逐 Token 重算基线，最后比较 KV Cache 增量计算。
 
 ## 当前状态
 
 - 共用任务以 `学习任务规划与进度.md` 为准。现已复制方向 A/B 的 RTL、testbench 和建工程脚本到 `hardware/`，尚未在新位置运行 Vivado。
 - 方向 A 的既有仿真日志记录了两组矩阵检查通过，同时在 `$finish` 后记录异常退出码；最新 RTL 尚缺一次正常结束的完整仿真和重新综合。
 - 方向 B 已完成初步源码阅读；数据打包方向、组合逻辑赋值及数值结果仍待验证。
-- software/transformer_numpy.py、software/qkv_fusion.py 与 software/qkv_benchmark.py 已在本机运行通过；学习者独立手算和理解项仍待验收。
+- software/transformer_numpy.py、software/qkv_fusion.py、software/qkv_benchmark.py 与 software/causal_attention.py 已在本机运行通过；学习者独立手算和理解项仍待验收。
 
 ## 下一步
 
-学习者已独立运行并指出本环境分开版更快；继续核对其对计时边界、预热、每组平均与跨组中位数的解释。之后按清单推进因果掩码与 KV Cache。若切换到方向 A 或 B，先从 hardware/ 重建 Vivado 工程。
+因果注意力实现已运行；下一步先验收学习者对掩码位置和第 1 行概率的独立解释，再实现逐 Token 重算与 KV Cache。QKV 计时方法的独立解释继续保留待验收。若切换到方向 A 或 B，先从 hardware/ 重建 Vivado 工程。
 
 ## 每次交接填写
 

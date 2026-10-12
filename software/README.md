@@ -1,6 +1,6 @@
 # NumPy Transformer 基础实现
 
-本目录对应任务清单的“注意力计算”和“Transformer block”。当前已实现单头注意力、Post-LN 前向计算、QKV 融合一致性检查和简单计时；因果掩码和 KV Cache 尚未实现。
+本目录对应任务清单的“注意力计算”和“Transformer block”。当前已实现单头注意力、Post-LN 前向计算、QKV 融合一致性检查和简单计时，以及因果掩码自检；KV Cache 尚未实现。
 
 ## 运行
 
@@ -11,8 +11,9 @@
     python software/transformer_numpy.py
     python software/qkv_fusion.py
     python software/qkv_benchmark.py
+    python software/causal_attention.py
 
-三个脚本已在 Python 3.14.6、NumPy 2.4.6 下运行；计时脚本还在 Python 3.13.3、NumPy 2.4.6 下复核。脚本固定随机种子 0，检查失败时抛出 AssertionError。基础脚本打印张量形状、注意力矩阵、行和与最终输出；融合脚本打印数值误差；计时脚本打印 NumPy 的 BLAS 构建后端和两种实现的中位时间。正常结束时各自打印 PASS。
+基础、融合、计时和因果注意力四个脚本已在 Python 3.14.6、NumPy 2.4.6 下运行；计时与因果注意力脚本还在 Python 3.13.3、NumPy 2.4.6 下复核。脚本固定随机种子 0，检查失败时抛出 AssertionError。基础脚本打印张量形状、注意力矩阵、行和与最终输出；融合脚本打印数值误差；计时脚本打印 NumPy 的 BLAS 构建后端和两种实现的中位时间。正常结束时各自打印 PASS。
 
 ## 文件中的计算顺序
 
@@ -63,3 +64,15 @@ qkv_benchmark.py 对应原始要求“题目二 → 4. 基础优化：QKV 融合
 一次额外拆分诊断（未计入主脚本）：在 scipy-openblas 环境中，三次分开投影约 49.411 微秒，单次融合矩阵乘法约 53.013 微秒，融合乘法加切分约 63.261 微秒；在 mkl-sdl 环境中，对应约 45.300、21.654、33.188 微秒。该诊断表明这一形状下融合乘法本身的速度与切分开销都会影响总结果。各数字来自独立计时，受波动影响，不应相加作精确等式。另在 scipy-openblas 环境将 OPENBLAS_NUM_THREADS 设为 1 后运行主脚本，分开/融合为 47.162/61.907 微秒每次，比值 0.762；该设置未改变本次快慢方向。
 
 脚本的 PASS 只表示 Q/K/V 的数值比较通过。时间比值小于 1 表示当前测量中分开版更快，大于 1 表示融合版更快；理论 MAC 相同不保证耗时相同。需要连同 Python、NumPy 和 BLAS 构建信息一起记录结果。
+
+## 因果自注意力
+
+causal_attention.py 对应原始要求“题目二 → 5. 软件部署小实验 → 方向 A：简单 KV Cache”的单层因果自注意力前提。本课实现整段输入的因果注意力；逐 Token 重算与缓存留待下一项。
+
+设计与数据流：复用 transformer_numpy.py 的稳定 softmax 和固定种子示例；输入 X(N,d)、四个 (d,d) 权重，先算 Q/K/V(N,d)，再算 scores=Q@K.T/√d(N,N)。行 i 是当前 Token，列 j 是可读取的 Token。np.triu(..., k=1) 标出 j>i 的未来位置；np.where 把这些分数改为 -inf；最后逐行 softmax 得到 weights(N,N)，输出 (weights@V)@Wo(N,d)。掩码必须在 softmax 前应用；事后清零概率会破坏行和为 1。
+
+手算例子：X=[[1,0],[0,1],[1,1]]，四个权重都为 2×2 单位阵。scores=XXᵀ/√2。第 0 行仅允许 j=0，权重 [1,0,0]，输出 [1,0]。第 1 行允许 j=0,1，分数为 0、1/√2，权重约 [0.3302,0.6698,0]。第 2 行允许所有位置，权重约 [0.2483,0.2483,0.5035]。k=1 从主对角线上方开始标记，因此当前位置仍可见；axis=-1 让 softmax 逐行归一化。
+
+检查：形状、未来权重严格为 0、权重非负、每行和约为 1、概率和输出有限；比较完整序列与各前缀输出，改动最后一个 Token 后确认前面位置输出不变。masked_scores 的禁用项故意是 -inf，不能对整个 masked_scores 作有限值断言；每行都包含当前位置，不会出现全 -inf 行。此脚本未实现 KV Cache，也不代表学习者独立掌握。
+
+在仓库根目录运行 python software/causal_attention.py。2026-10-12 在 Python 3.14.6 与 3.13.3、NumPy 2.4.6 下均打印 PASS；3×4 示例权重约为 [[1,0,0],[0.6092,0.3908,0],[0.0533,0.0081,0.9386]]。
