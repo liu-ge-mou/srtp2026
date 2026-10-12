@@ -51,4 +51,4 @@ GitHub 的 `main` 是进度和代码的共同基线。`学习任务规划与进�
 
 ## 工具与路径
 
-Git 负责同步源码与进度，OneDrive 只作为本机目录背景。工程脚本使用仓库相对路径；Vivado 安装位置可以因电脑而异。新电脑首次克隆后，先用 `hardware/*/create_project.tcl` 重建工程。软件部分尚未有实现，创建后应把依赖和运行命令写入 README，并将必要代码纳入此仓库。
+Git 负责同步源码与进度，OneDrive 只作为本机目录背景。工程脚本使用仓库相对路径；Vivado 安装位置可以因电脑而异。新电脑首次克隆后，先用 `hardware/*/create_project.tcl` 重建工程。软件代码位于 software/；新增实现时同步更新软件 README 中的依赖、运行命令和验证记录。
