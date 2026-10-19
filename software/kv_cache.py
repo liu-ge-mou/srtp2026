@@ -38,6 +38,7 @@ def decode_cached(x, Wq, Wk, Wv, Wo):
         "each_step": kv_elements_each_step,
         "total": sum(kv_elements_each_step),
         "repeated": 0,
+        "cache_bytes": K_cache.nbytes + V_cache.nbytes,
     }
     return all_outputs, counts
 
