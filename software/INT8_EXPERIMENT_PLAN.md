@@ -1,14 +1,14 @@
 # Transformer 软件方向 B：INT8 权重量化实验计划
 
-日期：2026-10-19。状态：计划已形成，量化源码和实验结果尚未实现/运行。
+日期：2026-10-19。状态：第 1 步转换函数与最小检查已实现并运行；Q/K/V 存储/投影及完整 Block 对比待实现。
 
 ## 任务来源和当前基础
 
 对应《脉动阵列硬件与 Transformer 软件.md》题目二第 5 节方向 B 第 1～4 项及第 6 节结果记录。原要求允许部署实验 A/B 二选一；现有 KV Cache 方向已有助手实现与运行记录，本计划是用户追加的量化实验，保留已有方向 A 及其独立验收待办。
 
-当前源码基线 5c58cf2。复用 software/transformer_numpy.py 中的 make_example() 和 transformer_block()：种子 0，X(3,4)，Wq/Wk/Wv 各 (4,4)，数据类型 float64。输出为完整 Post-LN H2(3,4)。qkv_fusion.py 展示了已有逐阶段比较方式；量化实验直接复用原 Block，便于保持同一前向计算路径。
+规划时的源码基线为 5c58cf2。复用 software/transformer_numpy.py 中的 make_example() 和 transformer_block()：种子 0，X(3,4)，Wq/Wk/Wv 各 (4,4)，数据类型 float64。输出为完整 Post-LN H2(3,4)。qkv_fusion.py 展示了已有逐阶段比较方式；量化实验直接复用原 Block，便于保持同一前向计算路径。
 
-本轮只规划。刚才“序列长度翻倍”主题停在选题说明，尚未完成推导或实验，不记为该知识点已讲解/验收。
+规划回合只形成计划；当时“序列长度翻倍”主题停在选题说明，未完成推导或实验。后续第 1 课实现状态见文件开头及运行记录。
 
 ## 实验设计
 
@@ -102,4 +102,4 @@ quant_parameters 中 Wq/Wk/Wv 是 W_hat。INT8 数组用于存储，前向乘法
 
 ## 进度界限
 
-计划完成不代表实现完成。当前尚无 int8_quantization.py、量化结果或量化学习者验收证据。下一课从第 1 步的手算与两个转换函数开始；此前 Transformer/KV Cache 理解待办继续保留。
+第 1 步已有 int8_quantization.py 的两个转换函数和最小例子检查，结果见 software/results/int8_quantization_step1.md；Python 3.13.3、3.14.6 / NumPy 2.4.6 下均 PASS。尚无 Q/K/V、完整 Block 的量化比较或学习者独立验收证据。下一课进入第 2 步存储与 Q/K/V 对比；此前理解待办继续保留。

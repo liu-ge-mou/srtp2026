@@ -116,6 +116,8 @@ kv_benchmark.py 对应原始要求“题目二 → 5 → 方向 A”第 4、5 �
 
 完整输入说明、误差与 9 组测量值见 [本次运行记录](results/kv_benchmark_2026-10-19.md)。所有运行证据属于助手；学习者独立运行与解释仍待验收。
 
-## INT8 权重量化计划
+## INT8 权重量化第 1 课
 
-用户追加的 Transformer 软件方向 B 计划见 [INT8 权重量化实验计划](INT8_EXPERIMENT_PLAN.md)。当前仅完成规划；量化实现和运行结果尚未完成。
+int8_quantization.py 已实现按矩阵的对称量化与反量化，并用固定 2×2 手算例子检查形状、端点、全零、舍入规则、半格误差界和原输入保持。运行 python software/int8_quantization.py；Python 3.13.3 和 3.14.6、NumPy 2.4.6 下均 PASS，示例最大重建误差约 0.004，scale/2 为 0.005。
+
+完整步骤见 [INT8 实验计划](INT8_EXPERIMENT_PLAN.md)，本课的计算、代码解释与实际输出见 [第 1 课记录](results/int8_quantization_step1.md)。Q/K/V 存储与投影比较、完整 Block 输出比较待后续实现；学习者独立理解待验收。

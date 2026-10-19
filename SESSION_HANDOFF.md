@@ -10,13 +10,12 @@
 
 ## 最近一次学习回合
 
-- 日期/主题：2026-10-19，用户要求规划 Transformer 软件方向 B 的 INT8 权重量化实验。
-- 来源与范围：原始题目二第 5 节方向 B 第 1～4 项及第 6 节。现有 KV Cache 作为已开展方向保留；新增量化计划，未实现量化源码。
-- 产物：software/INT8_EXPERIMENT_PLAN.md；README 增加计划入口，学习清单新增量化各待办。
-- 方案：三张 (4,4) float64 Wq/Wk/Wv 分别用一个 scale，对称 [-127,127]；处理全零，先 round/clip 再转换类型，反量化到原浮点类型；复制参数字典仅替换三个权重，两路复用同一 transformer_block。
-- 预计统计：三矩阵浮点数据 384 字节，INT8 数据 48 字节，加三个 float64 scale 为 72 字节；尚未量化运行，用于后续 nbytes 核对。运行期反量化数组另占空间，不把打包数据当峰值内存。
-- 验证与状态：本轮只核对文件和原始要求，未运行 Python/Vivado，量化待实现、误差待实测、学习者理解待验收。中途被用户转向的“序列长度翻倍”仅选题，未完成讲解。
-- 下一步：按计划第 1 步手算并实现量化/反量化，再做存储/QKV、完整 Block 与结果分析。原有基础和 KV Cache 独立验收继续保留。
+- 日期/主题：2026-10-19，INT8 第 1 课，对应原始题目二第 5 节方向 B 的转换公式及实验计划第 1 步。
+- 已讲解：scale 的原单位含义、[-127,127] 对称范围、手算缩放/舍入/反量化、零矩阵处理、NumPy 最近偶数规则及半格误差推导；沿两个函数执行顺序解释代码与检查。
+- 产物：software/int8_quantization.py，software/results/int8_quantization_step1.md；计划、README、REPRODUCE 和学习清单同步更新。
+- 验证：基线 86ac4c6，课前拉取 Already up to date；D:/python/python.exe 与默认 python 分别为 3.13.3、3.14.6，NumPy 均 2.4.6，运行 software/int8_quantization.py 均 PASS/退出码 0。s=0.01，q=[[-127,24],[50,127]]，重建最大误差约 0.004，半格界 0.005；手算、形状、零矩阵、端点、舍入与输入保持通过。
+- 待办：学习者独立理解仍无证据；存储/QKV、完整 Block 对比未实现。此前 Transformer/KV Cache 待验收继续保留。
+- 下一步：计划第 2 步，复用 make_example() 的同一 X 和 Wq/Wk/Wv，统计三矩阵、三个 scale 的数据字节，比较三个投影的误差。
 
 ## 上一回合记录（2026-10-18）
 
@@ -36,7 +35,7 @@
 
 ## 下一步
 
-用户当前主线转为 INT8 权重量化实验，下一步从 software/INT8_EXPERIMENT_PLAN.md 第 1 步开始；此前七脚本复现和 KV Cache 独立验收状态保留。因果掩码、缓存/重算数据流、计时方法和基础 Transformer 的独立验收继续保留。若切换到方向 A 或 B，先从 hardware/ 重建 Vivado 工程。
+INT8 第 1 步已由助手实现并运行，下一步进入 software/INT8_EXPERIMENT_PLAN.md 第 2 步存储与 Q/K/V 对比；此前七脚本复现和 KV Cache 独立验收状态保留。因果掩码、缓存/重算数据流、计时方法和基础 Transformer 的独立验收继续保留。若切换到方向 A 或 B，先从 hardware/ 重建 Vivado 工程。
 
 ## 每次交接填写
 
