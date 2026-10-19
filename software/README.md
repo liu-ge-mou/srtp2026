@@ -116,8 +116,10 @@ kv_benchmark.py 对应原始要求“题目二 → 5 → 方向 A”第 4、5 �
 
 完整输入说明、误差与 9 组测量值见 [本次运行记录](results/kv_benchmark_2026-10-19.md)。所有运行证据属于助手；学习者独立运行与解释仍待验收。
 
-## INT8 权重量化第 1 课
+## INT8 权重量化第 1～3 课
 
-int8_quantization.py 已实现按矩阵的对称量化与反量化，并用固定 2×2 手算例子检查形状、端点、全零、舍入规则、半格误差界和原输入保持。运行 python software/int8_quantization.py；Python 3.13.3 和 3.14.6、NumPy 2.4.6 下均 PASS，示例最大重建误差约 0.004，scale/2 为 0.005。
+int8_quantization.py 实现转换规则、三张权重存储、Q/K/V 投影误差和完整 Post-LN Block 对比。运行 python software/int8_quantization.py。第 1 课手算和边界检查仍执行；第 2、3 课复用 make_example() 和原 transformer_block()，两路只替换 Wq/Wk/Wv。
 
-完整步骤见 [INT8 实验计划](INT8_EXPERIMENT_PLAN.md)，本课的计算、代码解释与实际输出见 [第 1 课记录](results/int8_quantization_step1.md)。Q/K/V 存储与投影比较、完整 Block 输出比较待后续实现；学习者独立理解待验收。
+Python 3.13.3、3.14.6 / NumPy 2.4.6 下均通过检查。三权重原 float64 数据 384 字节，int8 数据 48 字节、三个 float64 scale 24 字节，合计 72 字节；反量化浮点数组另占 384 字节。Q/K/V 最大绝对误差约为 0.0099993 / 0.0104887 / 0.0106524，最终 H2 最大绝对误差约 0.00147817。实际前向仍是反量化后的浮点乘法。
+
+实验步骤见 [计划](INT8_EXPERIMENT_PLAN.md)。[第 1 课记录](results/int8_quantization_step1.md) 保留此前最小例子；[第 2、3 课记录](results/int8_quantization.md) 包含逐阶段误差、设计与两个环境的完整输出链接。最终综合结论与学习者独立验收留到第 4 课。

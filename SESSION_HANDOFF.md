@@ -10,12 +10,13 @@
 
 ## 最近一次学习回合
 
-- 日期/主题：2026-10-19，INT8 第 1 课，对应原始题目二第 5 节方向 B 的转换公式及实验计划第 1 步。
-- 已讲解：scale 的原单位含义、[-127,127] 对称范围、手算缩放/舍入/反量化、零矩阵处理、NumPy 最近偶数规则及半格误差推导；沿两个函数执行顺序解释代码与检查。
-- 产物：software/int8_quantization.py，software/results/int8_quantization_step1.md；计划、README、REPRODUCE 和学习清单同步更新。
-- 验证：基线 86ac4c6，课前拉取 Already up to date；D:/python/python.exe 与默认 python 分别为 3.13.3、3.14.6，NumPy 均 2.4.6，运行 software/int8_quantization.py 均 PASS/退出码 0。s=0.01，q=[[-127,24],[50,127]]，重建最大误差约 0.004，半格界 0.005；手算、形状、零矩阵、端点、舍入与输入保持通过。
-- 待办：学习者独立理解仍无证据；存储/QKV、完整 Block 对比未实现。此前 Transformer/KV Cache 待验收继续保留。
-- 下一步：计划第 2 步，复用 make_example() 的同一 X 和 Wq/Wk/Wv，统计三矩阵、三个 scale 的数据字节，比较三个投影的误差。
+- 日期/主题：2026-10-19，用户要求连续讲 INT8 第 2、3 课；对应原始题目二第 5 节方向 B 第 1～3 项。
+- 已讲解：手算 X=[1,2] 时投影由 [-0.262,2.777] 变为 [-0.270,2.780]；用 DeltaQ=X@DeltaW 理解误差；含 scale 的真实数据存储；两路复用同一 Block，逐阶段分析量化变化。
+- 代码与记录：software/int8_quantization.py 新增 compare_quantization()/投影手算检查，保留第 1 课检查；software/results/int8_quantization.md、int8_quantization_py313.txt、int8_quantization_py314.txt 保存实际运行。
+- 验证：Python 3.13.3 与 3.14.6、NumPy 2.4.6 下运行均 PASS/退出码0。三权重384字节、int8 48、scale24，合计72；Q/K/V误差约0.0099993/0.0104887/0.0106524；attention_output约0.02883672、H1约0.00403126、F约0.02145592、H2约0.00147817。未设最终 H2 的任意通过阈值，未测试运行加速。
+- 独立验收：仍无学习者独立证据，既有理解项保留；第 4 课综合总结和独立复现尚待完成。
+- 同步：开始基线 bba0039，本地领先一个提交；课前拉取网络连接失败。结束时以 Git 状态核对。
+- 下一步：量化第 4 课，整理整体实验结论并结合学习者自己的手算和运行记录验收；已有基础及缓存待办不变。
 
 ## 上一回合记录（2026-10-18）
 
@@ -35,7 +36,7 @@
 
 ## 下一步
 
-INT8 第 1 步已由助手实现并运行，下一步进入 software/INT8_EXPERIMENT_PLAN.md 第 2 步存储与 Q/K/V 对比；此前七脚本复现和 KV Cache 独立验收状态保留。因果掩码、缓存/重算数据流、计时方法和基础 Transformer 的独立验收继续保留。若切换到方向 A 或 B，先从 hardware/ 重建 Vivado 工程。
+INT8 第 1～3 步已有助手实现、讲解与运行证据，下一步为第 4 课综合总结和学习者独立复现；此前七脚本复现和 KV Cache 独立验收状态保留。因果掩码、缓存/重算数据流、计时方法和基础 Transformer 的独立验收继续保留。若切换到方向 A 或 B，先从 hardware/ 重建 Vivado 工程。
 
 ## 每次交接填写
 

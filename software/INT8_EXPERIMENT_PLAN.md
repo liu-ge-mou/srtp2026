@@ -1,6 +1,6 @@
 # Transformer 软件方向 B：INT8 权重量化实验计划
 
-日期：2026-10-19。状态：第 1 步转换函数与最小检查已实现并运行；Q/K/V 存储/投影及完整 Block 对比待实现。
+日期：2026-10-19。状态：第 1～3 步已由助手实现并运行；第 4 课综合总结与学习者独立验收待完成。
 
 ## 任务来源和当前基础
 
@@ -102,4 +102,4 @@ quant_parameters 中 Wq/Wk/Wv 是 W_hat。INT8 数组用于存储，前向乘法
 
 ## 进度界限
 
-第 1 步已有 int8_quantization.py 的两个转换函数和最小例子检查，结果见 software/results/int8_quantization_step1.md；Python 3.13.3、3.14.6 / NumPy 2.4.6 下均 PASS。尚无 Q/K/V、完整 Block 的量化比较或学习者独立验收证据。下一课进入第 2 步存储与 Q/K/V 对比；此前理解待办继续保留。
+第 1～3 步已有 int8_quantization.py 的转换函数、compare_quantization() 和完整检查。Python 3.13.3、3.14.6 / NumPy 2.4.6 下均 PASS。第 1 课结果见 software/results/int8_quantization_step1.md；第 2、3 课见 software/results/int8_quantization.md 及原始输出。下一课为综合总结与学习者独立复现/解释；此前理解待办继续保留。
